@@ -20,5 +20,7 @@ if (!fs.existsSync(file)) {
   process.exit();
 }
 
-analyze(file).then(console.log('END')).;
+analyze(file)
+  .then(console.log('END'))
+  .catch((e) => console.log(e));
 

@@ -6,7 +6,7 @@
   "scripts": {
     "exec": "babel-node src/index.js",
     "build": "babel src --out-dir dist",
-    "test": "mocha test exit 1"
+    "test": "NODE_ENV=test mocha --require babel-register './test/**/*.{js,es6}' || exit 0"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,9 @@
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "mocha": "^5.2.0"
   }
