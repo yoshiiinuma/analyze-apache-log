@@ -1,0 +1,33 @@
+{
+  "name": "analyze-apache-log",
+  "version": "1.0.0",
+  "description": "Analyze apache log and return the summary.",
+  "main": "index.js",
+  "scripts": {
+    "exec": "babel-node src/index.js",
+    "build": "babel src --out-dir dist",
+    "test": "mocha test exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yoshiiinuma/analyze-apache-log.git"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
+  "author": "Yoshiaki Iinuma",
+  "license": "ISC",
+  "keywords": [
+    "apache",
+    "log"
+  ],
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0"
+  }
+}
