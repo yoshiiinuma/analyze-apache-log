@@ -1,5 +1,6 @@
 
 import fs from 'fs';
+import util from 'util';
 import { analyze } from './analyzer.js';
 
 const usage = () => {
@@ -21,6 +22,6 @@ if (!fs.existsSync(file)) {
 }
 
 analyze(file)
-  .then(console.log('END'))
+  .then((r) => console.log(util.inspect(r, false, null, true)))
   .catch((e) => console.log(e));
 
