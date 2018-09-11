@@ -1,7 +1,7 @@
 
 import fs from 'fs';
 import util from 'util';
-import { analyze, analyzeOld } from './analyzer.js';
+import { analyze, analyzeStream } from './analyzer.js';
 
 const DEFAULT_PERIOD = 1;
 
@@ -51,9 +51,9 @@ if (process.argv.length > 3) {
   }
 }
 
-analyze(file, opts).pipe(process.stdout);
+//analyzeStream(file, opts).pipe(process.stdout);
 
-//analyzeOld(file, opts)
-//  .then((r) => console.log(util.inspect(r, false, null, true)))
-//  .catch((e) => console.log(e));
-//
+analyze(file, opts)
+  .then((r) => console.log(util.inspect(r, false, null, true)))
+  .catch((e) => console.log(e));
+

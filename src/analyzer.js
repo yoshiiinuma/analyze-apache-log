@@ -12,7 +12,7 @@ import Logger from './logger.js';
  *
  *
  **/
-export const analyze = (file, opts = {}) => {
+export const analyzeStream = (file, opts = {}) => {
   const min = (opts.period == undefined)? 1 : parseInt(opts.period);
   const timeEnd = minToTimeEndOffset(min);
 
@@ -31,7 +31,7 @@ export const analyze = (file, opts = {}) => {
   return instream.pipe(linestream);
 }
 
-export const analyzeOld = (file, opts = {}) => {
+export const analyze = (file, opts = {}) => {
   const min = (opts.period == undefined)? 1 : parseInt(opts.period);
   const timeEnd = minToTimeEndOffset(min);
 
@@ -49,6 +49,7 @@ export const analyzeOld = (file, opts = {}) => {
   return new Promise((resolve, reject) => {
     let r = {};
     let cur = null;
+    let timestamp = null;
 
     const rl = readline.createInterface({
       input: fs.createReadStream(file),
@@ -64,6 +65,10 @@ export const analyzeOld = (file, opts = {}) => {
          inSize, outSize, elapsed] = l.split(' | ');
 
       time = time.slice(1, 21);
+      timestamp = time.slice(0, 11) + ' ' + time.slice(12, 21);
+
+      console.log(time);
+      console.log(timestamp);
 
       if (!time.startsWith(cur)) {
         cur = time.slice(0, timeEnd);
