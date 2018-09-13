@@ -54,6 +54,8 @@ if (process.argv.length > 3) {
 //analyzeStream(file, opts).pipe(process.stdout);
 
 analyze(file, opts)
-  .then((r) => console.log(util.inspect(r, false, null, true)))
+  //.then((r) => console.log(util.inspect(r, false, null, true)))
+  //.then((r) => console.log('END'))
+  .then((r) => console.log(Object.keys(r)))
   .catch((e) => console.log(e));
 

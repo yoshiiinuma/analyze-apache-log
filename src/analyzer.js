@@ -34,22 +34,13 @@ export const analyzeStream = (file, opts = {}) => {
 export const analyze = (file, opts = {}) => {
   const min = (opts.period == undefined)? 1 : parseInt(opts.period);
   const timeEnd = minToTimeEndOffset(min);
-
-  let instream = fs.createReadStream(file)
-    .on('error', (err) => {
-      Logger.error('PushManager#push instream');
-      Logger.error(err)
-    });
-  let linestream = new LineStream()
-    .on('error', (err) => {
-      Logger.error('PushManager#read linestream');
-      Logger.error(err)
-    });
+  const period = min * 60 * 1000;
 
   return new Promise((resolve, reject) => {
     let r = {};
     let cur = null;
     let timestamp = null;
+    let startTime = null;
 
     const rl = readline.createInterface({
       input: fs.createReadStream(file),
@@ -65,14 +56,28 @@ export const analyze = (file, opts = {}) => {
          inSize, outSize, elapsed] = l.split(' | ');
 
       time = time.slice(1, 21);
-      timestamp = time.slice(0, 11) + ' ' + time.slice(12, 21);
-
-      console.log(time);
-      console.log(timestamp);
-
-      if (!time.startsWith(cur)) {
+      timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
+      if (startTime === null) {
+        startTime = timestamp;
         cur = time.slice(0, timeEnd);
+        //cur = time;
         r[cur] = {};
+      }
+
+      //if (!time.startsWith(cur)) {
+      //if (timestamp >= startTime + period) {
+      console.log(time);
+      console.log(cur);
+      console.log(timestamp);
+      console.log(period);
+      console.log(timestamp % period);
+      if (timestamp % period === 0) {
+        cur = time.slice(0, timeEnd);
+        //cur = time;
+        console.log(timestamp);
+        console.log(cur);
+        r[cur] = {};
+        startTime = timestamp;
       }
       if (r[cur][ip] == undefined) r[cur][ip] = {};
       if (r[cur][ip][req] == undefined) r[cur][ip][req] = 0;
