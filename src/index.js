@@ -2,6 +2,7 @@
 import fs from 'fs';
 import util from 'util';
 import { analyze, analyzeStream } from './analyzer.js';
+import { report } from './report.js';
 
 const DEFAULT_PERIOD = 1;
 
@@ -13,8 +14,9 @@ const usage = () => {
   console.log('');
   console.log('   OPTIONS:');
   console.log('   -p or --period <MINS>:   Period to summarize; DEFAULT ' + DEFAULT_PERIOD + ' mins');
-  console.log('   -D or --DEBUG:            Prints debug messages');
-  console.log('   -h or --help:             Shows this usage');
+  console.log('   -t or --top <NUM>:       Shows only top NUM records');
+  console.log('   -D or --DEBUG:           Prints debug messages');
+  console.log('   -h or --help:            Shows this usage');
   console.log('');
 };
 
@@ -41,6 +43,10 @@ if (process.argv.length > 3) {
       i++;
       opts.period = parseInt(process.argv[i]);
     }
+    if (arg === '-t' || arg === '--top') {
+      i++;
+      opts.top = parseInt(process.argv[i]);
+    }
     if (arg === '-D' || arg === '--DEBUG') {
       opts.debug = true;
     }
@@ -54,8 +60,6 @@ if (process.argv.length > 3) {
 //analyzeStream(file, opts).pipe(process.stdout);
 
 analyze(file, opts)
-  //.then((r) => console.log(util.inspect(r, false, null, true)))
-  //.then((r) => console.log('END'))
-  .then((r) => console.log(Object.keys(r)))
+  .then((r) => report(r, opts))
   .catch((e) => console.log(e));
 

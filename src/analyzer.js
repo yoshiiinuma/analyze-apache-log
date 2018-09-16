@@ -40,7 +40,7 @@ export const analyze = (file, opts = {}) => {
     let r = {};
     let cur = null;
     let timestamp = null;
-    let startTime = null;
+    let bucket = null;
 
     const rl = readline.createInterface({
       input: fs.createReadStream(file),
@@ -57,31 +57,16 @@ export const analyze = (file, opts = {}) => {
 
       time = time.slice(1, 21);
       timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
-      if (startTime === null) {
-        startTime = timestamp;
-        cur = time.slice(0, timeEnd);
-        //cur = time;
-        r[cur] = {};
-      }
 
-      //if (!time.startsWith(cur)) {
-      //if (timestamp >= startTime + period) {
-      console.log(time);
-      console.log(cur);
-      console.log(timestamp);
-      console.log(period);
-      console.log(timestamp % period);
-      if (timestamp % period === 0) {
+      if (bucket === null || timestamp >= bucket + period) {
+        bucket = timestamp - timestamp % 60000;
         cur = time.slice(0, timeEnd);
-        //cur = time;
-        console.log(timestamp);
-        console.log(cur);
         r[cur] = {};
-        startTime = timestamp;
       }
-      if (r[cur][ip] == undefined) r[cur][ip] = {};
-      if (r[cur][ip][req] == undefined) r[cur][ip][req] = 0;
-      r[cur][ip][req]++;
+      if (r[cur][ip] == undefined) r[cur][ip] = { count:0, requests: {} };
+      if (r[cur][ip]['requests'][req] == undefined) r[cur][ip]['requests'][req] = 0;
+      r[cur][ip]['count']++;
+      r[cur][ip]['requests'][req]++;
     });
   });
 }
