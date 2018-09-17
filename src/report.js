@@ -14,7 +14,7 @@ export const report = (data, opt) => {
       showNumberOfRequests(data, opt); 
       break;
     case 'ip':
-      showIPs(data, opt); 
+      showRequestsPerIP(data, opt); 
       break;
     default:
       throw 'Unsupported Command: ' + opt.command;
@@ -44,7 +44,7 @@ export const showNumberOfRequests = (data, opt) => {
   }
 }
 
-export const showIPs = (data, opt) => {
+export const showRequetsPerIP = (data, opt) => {
   for(const [time, tbl] of Object.entries(data)) {
     console.log('---< ' + time + ' >---------------------------------------------------------');
     Object.entries(tbl.ip)
