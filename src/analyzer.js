@@ -37,6 +37,51 @@ export const analyze = (file, opts = {}) => {
   const period = min * 60 * 1000;
 
   return new Promise((resolve, reject) => {
+    let results = [];
+    let r = null;
+    let timeslot = null;
+
+    const rl = readline.createInterface({
+      input: fs.createReadStream(file),
+      terminal: false
+    });
+
+    rl.on('close', () => {
+      if (r !== null) results.push(r);
+      resolve(results)
+    });
+    rl.on('error', (e) => reject(e));
+    rl.on('line', (line) => {
+      const [ip, timeOrig, usr, name, req, cd, ref, agt, resSize,
+         inSize, outSize, elapsed] = line.split(' | ');
+
+      if (opts.ip && ip !== opts.ip) return;
+
+      let time = timeOrig.slice(1, 21);
+      let timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
+
+      if (timeslot === null || timestamp >= timeslot + period) {
+        if (r !== null) results.push(r);
+        timeslot = timestamp - timestamp % 60000;
+        let displayTime = time.slice(0, timeEnd);
+        r = { timestamp, displayTime, count: 0, ip: {} };
+      }
+      if (r['ip'][ip] == undefined) r['ip'][ip] = { count:0, requests: {} };
+      if (r['ip'][ip]['requests'][req] == undefined) r['ip'][ip]['requests'][req] = 0;
+
+      r['count']++;
+      r['ip'][ip]['count']++;
+      r['ip'][ip]['requests'][req]++;
+    });
+  });
+}
+
+export const analyzeOld = (file, opts = {}) => {
+  const min = (opts.period == undefined)? 1 : parseInt(opts.period);
+  const timeEnd = minToTimeEndOffset(min);
+  const period = min * 60 * 1000;
+
+  return new Promise((resolve, reject) => {
     let r = {};
     let cur;
     let time;
