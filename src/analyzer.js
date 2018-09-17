@@ -50,12 +50,10 @@ export const analyze = (file, opts = {}) => {
     rl.on('close', () => resolve(r));
     rl.on('error', (e) => reject(e));
     rl.on('line', (l) => {
-      let ip, time, usr, name, req, cd, ref, agt, resSize, inSize, outSize, elapsed;
-
-      [ip, time, usr, name, req, cd, ref, agt, resSize,
+      const [ip, timeOrig, usr, name, req, cd, ref, agt, resSize,
          inSize, outSize, elapsed] = l.split(' | ');
 
-      time = time.slice(1, 21);
+      let time = timeOrig.slice(1, 21);
       timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
       if (timeslot === null || timestamp >= timeslot + period) {
