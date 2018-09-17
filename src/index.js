@@ -13,7 +13,7 @@ const usage = () => {
   console.log('');
   console.log('   COMMAND:');
   console.log('       req:                 Show the number of requests');
-  console.log('        ip:                 Show IP addresses');
+  console.log('        ip:                 Show the number of requests per IP');
   console.log('');
   console.log('   LOGFILE: Path to the log file to be analyzed');
   console.log('');
