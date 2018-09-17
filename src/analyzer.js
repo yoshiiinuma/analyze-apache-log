@@ -38,7 +38,8 @@ export const analyze = (file, opts = {}) => {
 
   return new Promise((resolve, reject) => {
     let r = {};
-    let cur = null;
+    let cur;
+    let time;
     let timestamp = null;
     let timeslot = null;
 
@@ -53,7 +54,9 @@ export const analyze = (file, opts = {}) => {
       const [ip, timeOrig, usr, name, req, cd, ref, agt, resSize,
          inSize, outSize, elapsed] = l.split(' | ');
 
-      let time = timeOrig.slice(1, 21);
+      if (opts.ip && ip !== opts.ip) return;
+
+      time = timeOrig.slice(1, 21);
       timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
       if (timeslot === null || timestamp >= timeslot + period) {

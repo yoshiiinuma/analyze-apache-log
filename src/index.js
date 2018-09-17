@@ -5,22 +5,25 @@ import { analyze, analyzeStream } from './analyzer.js';
 import { report } from './report.js';
 
 const DEFAULT_PERIOD = 1;
-const COMMANDS = ['req', 'ip'];
+const COMMANDS = ['count-req', 'count-ip'];
 
 const usage = () => {
   console.log('');
   console.log('USAGE: node analyze-apache-log.js <COMMAND> <LOGFILE> [OPTION]...');
   console.log('');
   console.log('   COMMAND:');
-  console.log('       req:                 Show the number of requests');
-  console.log('        ip:                 Show the number of requests per IP');
+  console.log('');
+  console.log('       count-req:           Counts the number of requests');
+  console.log('       count-ip:            Counts the number of requests per IP');
   console.log('');
   console.log('   LOGFILE: Path to the log file to be analyzed');
   console.log('');
   console.log('');
   console.log('   OPTIONS:');
+  console.log('');
   console.log('   -p or --period <MINS>:   Period to summarize; DEFAULT ' + DEFAULT_PERIOD + ' mins');
   console.log('   -t or --top <NUM>:       Shows only top NUM records');
+  console.log('   --IP <IP>:               Shows the requested URLs from the specified IP');
   console.log('   -D or --DEBUG:           Prints debug messages');
   console.log('   -h or --help:            Shows this usage');
   console.log('');
@@ -61,6 +64,10 @@ if (process.argv.length > 3) {
     if (arg === '-t' || arg === '--top') {
       i++;
       opts.top = parseInt(process.argv[i]);
+    }
+    if (arg === '--ip') {
+      i++;
+      opts.ip = process.argv[i];
     }
     if (arg === '-D' || arg === '--DEBUG') {
       opts.debug = true;

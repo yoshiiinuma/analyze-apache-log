@@ -9,18 +9,22 @@ import util from 'util';
  **/
 export const report = (data, opt) => {
   //console.log(util.inspect(data, false, null, true));
+  //console.log(Object.keys(data));
   switch (opt.command) {
-    case 'req':
+    case 'count-req':
       showNumberOfRequests(data, opt); 
       break;
-    case 'ip':
-      showRequestsPerIP(data, opt); 
+    case 'count-ip':
+      if (opt.ip) {
+        showRequestUrls(data, opt);
+      } else {
+        showRequestsPerIP(data, opt);
+      }
       break;
     default:
       throw 'Unsupported Command: ' + opt.command;
     
   }
-  //console.log(Object.keys(data));
 }
 
 export const showNumberOfRequests = (data, opt) => {
@@ -57,6 +61,25 @@ export const showRequestsPerIP = (data, opt) => {
       .map((e) => {
         const [ip, reqs] = e;
         console.log(ip + ': ' + reqs.count);
+      })
+  }
+}
+
+export const showRequestUrls = (data, opt) => {
+  for(const [time, tbl] of Object.entries(data)) {
+    console.log('---< ' + time + ' >---------------------------------------------------------');
+    const ip = Object.keys(tbl.ip)[0];
+    const obj = tbl.ip[ip];
+    Object.entries(obj.requests)
+      .sort((x, y) => { return y[1] - x[1]})
+      .filter((e, i) => {
+        if (!opt.top) return true;
+        if (opt.top > i) return true; 
+        return false;
+      })
+      .map((e) => {
+        const [url, count] = e;
+        console.log(url + ': ' + count);
       })
   }
 }
