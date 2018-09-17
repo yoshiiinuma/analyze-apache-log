@@ -40,7 +40,7 @@ export const analyze = (file, opts = {}) => {
     let r = {};
     let cur = null;
     let timestamp = null;
-    let bucket = null;
+    let timeslot = null;
 
     const rl = readline.createInterface({
       input: fs.createReadStream(file),
@@ -58,8 +58,8 @@ export const analyze = (file, opts = {}) => {
       time = time.slice(1, 21);
       timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
-      if (bucket === null || timestamp >= bucket + period) {
-        bucket = timestamp - timestamp % 60000;
+      if (timeslot === null || timestamp >= timeslot + period) {
+        timeslot = timestamp - timestamp % 60000;
         cur = time.slice(0, timeEnd);
         r[cur] = { count: 0, ip: {} };
       }
