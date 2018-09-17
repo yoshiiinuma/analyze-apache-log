@@ -5,12 +5,18 @@ import { analyze, analyzeStream } from './analyzer.js';
 import { report } from './report.js';
 
 const DEFAULT_PERIOD = 1;
+const COMMANDS = ['req', 'ip'];
 
 const usage = () => {
   console.log('');
-  console.log('USAGE: node analyze-apache-log.js <LOGFILE> [OPTION]...');
+  console.log('USAGE: node analyze-apache-log.js <COMMAND> <LOGFILE> [OPTION]...');
+  console.log('');
+  console.log('   COMMAND:');
+  console.log('       req:                 Show the number of requests');
+  console.log('        ip:                 Show IP addresses');
   console.log('');
   console.log('   LOGFILE: Path to the log file to be analyzed');
+  console.log('');
   console.log('');
   console.log('   OPTIONS:');
   console.log('   -p or --period <MINS>:   Period to summarize; DEFAULT ' + DEFAULT_PERIOD + ' mins');
@@ -20,7 +26,7 @@ const usage = () => {
   console.log('');
 };
 
-if (process.argv.length < 3) {
+if (process.argv.length < 4) {
   usage();
   process.exit();
 }
@@ -29,7 +35,16 @@ let opts = {
   debug: false
 };
 
-const file = process.argv[2];
+const cmd = process.argv[2];
+if (COMMANDS.some((r) => { return r === cmd })) {
+  opts.command = cmd;
+} else {
+  console.log('Command Not Found: ' + cmd + "\n");
+  usage();
+  process.exit();
+}
+
+const file = process.argv[3];
 if (!fs.existsSync(file)) {
   console.log('File Not Found: ' + file + "\n");
   usage();

@@ -61,12 +61,14 @@ export const analyze = (file, opts = {}) => {
       if (bucket === null || timestamp >= bucket + period) {
         bucket = timestamp - timestamp % 60000;
         cur = time.slice(0, timeEnd);
-        r[cur] = {};
+        r[cur] = { count: 0, ip: {} };
       }
-      if (r[cur][ip] == undefined) r[cur][ip] = { count:0, requests: {} };
-      if (r[cur][ip]['requests'][req] == undefined) r[cur][ip]['requests'][req] = 0;
-      r[cur][ip]['count']++;
-      r[cur][ip]['requests'][req]++;
+      if (r[cur]['ip'][ip] == undefined) r[cur]['ip'][ip] = { count:0, requests: {} };
+      if (r[cur]['ip'][ip]['requests'][req] == undefined) r[cur]['ip'][ip]['requests'][req] = 0;
+
+      r[cur]['count']++;
+      r[cur]['ip'][ip]['count']++;
+      r[cur]['ip'][ip]['requests'][req]++;
     });
   });
 }
