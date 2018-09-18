@@ -60,6 +60,9 @@ export const analyze = (file, opts = {}) => {
       let time = timeOrig.slice(1, 21);
       let timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
+      if (opts.from && timestamp < opts.from) return;
+      if (opts.to && timestamp >= opts.to) return;
+
       if (timeslot === null || timestamp >= timeslot + period) {
         if (r !== null) results.push(r);
         timeslot = timestamp - timestamp % 60000;
