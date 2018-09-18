@@ -21,13 +21,13 @@ const usage = () => {
   console.log('');
   console.log('   OPTIONS:');
   console.log('');
-  console.log('   -p or --period <MINS>:     Period to summarize; DEFAULT ' + DEFAULT_PERIOD + ' mins');
-  console.log('   -t or --top <NUM>:         Shows only top NUM records');
-  console.log('   --ip <IP>:                 Shows the requested URLs only from the specified IP');
-  console.log('   --from <MM/YYYY-HH:mm>:    Specifies the start time to filter out time e.g. 1/2/2018-3:4');
-  console.log('   --to <MM/DD/YYYY-HH:mm>:   Specifies the end time to filter out time e.g. 1/2/2018-3:4');
-  console.log('   -D or --DEBUG:             Prints debug messages');
-  console.log('   -h or --help:              Shows this usage');
+  console.log('   -p or --period <MINS>:      Period to summarize; DEFAULT ' + DEFAULT_PERIOD + ' mins');
+  console.log('   -t or --top <NUM>:          Shows only top NUM records');
+  console.log('   --ip <IP>:                  Shows the requested URLs only from the specified IP');
+  console.log('   --from <MM/YYYY>[-HH:mm]:   Specifies the start time to filter out time e.g. 1/2/2018-3:4');
+  console.log('   --to <MM/DD/YYYY>[-HH:mm]:  Specifies the end time to filter out time e.g. 1/2/2018-3:4');
+  console.log('   -D or --DEBUG:              Prints debug messages');
+  console.log('   -h or --help:               Shows this usage');
   console.log('');
 };
 
@@ -56,8 +56,7 @@ if (!fs.existsSync(file)) {
   process.exit();
 }
 
-//const regexDate = /^20\d{2}-[01]\d-[0123]\dT[01]\d:[0-5]\d$/;
-const regexDate = /^[01]?\d\/[0123]?\d\/20\d{2}-[01]?\d:[0-5]?\d$/;
+const regexDate = /^[01]?\d\/[0123]?\d\/20\d{2}(-[01]?\d:[0-5]?\d)?$/;
 
 if (process.argv.length > 3) {
   for (let i = 3; i < process.argv.length; i++) {
@@ -80,10 +79,8 @@ if (process.argv.length > 3) {
       if (!time.match(regexDate)) {
         console.log('Invalid Time: ' + time);
         console.log('')
-        console.log('  Must be MM/DD/YYYY-HH:mm')
-        console.log('      e.g. 1/2/2018-3:4')
-        //console.log('  Must be YYYY-MM-DDTHH:mm')
-        //console.log('      e.g. 2018-01-02T03:04')
+        console.log('  Must be MM/DD/YYYY[-HH:mm]')
+        console.log('      e.g. 1/2/2018, 1/2/2018-3:4')
         usage();
         process.exit();
       }
@@ -95,8 +92,8 @@ if (process.argv.length > 3) {
       if (!time.match(regexDate)) {
         console.log('Invalid Time: ' + time);
         console.log('')
-        console.log('  Must be MM/DD/YYYY-HH:mm')
-        console.log('      e.g. 1/2/2018-3:4')
+        console.log('  Must be MM/DD/YYYY[-HH:mm]')
+        console.log('      e.g. 1/2/2018, 1/2/2018-3:4')
         usage();
         process.exit();
       }
