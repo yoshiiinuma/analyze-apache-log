@@ -1,5 +1,6 @@
 
 import util from 'util';
+import { Writable } from 'stream';
 
 /**
  * Time - Count
@@ -22,6 +23,18 @@ export const report = (data, opt) => {
       break;
     default:
       throw 'Unsupported Command: ' + opt.command;
+  }
+}
+
+export class StreamReport extends Writable {
+  constructor(opt = {}) {
+    super({ objectMode: true });
+    this.opt = opt;
+  }
+
+  _write(obj, encoding, callback) {
+    reportStream(obj, this.opt);
+    callback();
   }
 }
 

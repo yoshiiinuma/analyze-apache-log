@@ -5,7 +5,7 @@ import readline from 'readline';
 
 import Summarizer from './summarizer.js';
 import Logger from './logger.js';
-import { reportStream } from './report.js';
+import { reportStream, StreamReport } from './report.js';
 
 /**
  * summarize followings per N minutes
@@ -30,13 +30,14 @@ export const analyzeStream = (file, opt = {}) => {
       Logger.error(err)
     });
   let summarizer = new Summarizer({ period, timeEndOffset });
+  let report = new StreamReport(opt);
 
   //summarizer.on('data', (obj) => console.log(obj))
-  summarizer.on('data', (r) => {
-    reportStream(r, opt);
-  });
+  //summarizer.on('data', (r) => {
+  //  reportStream(r, opt);
+  //});
 
-  return instream.pipe(linestream).pipe(summarizer);
+  return instream.pipe(linestream).pipe(summarizer).pipe(report);
 }
 
 export const analyze = (file, opt = {}) => {
