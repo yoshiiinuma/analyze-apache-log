@@ -22,7 +22,6 @@ export const report = (data, opt) => {
       break;
     default:
       throw 'Unsupported Command: ' + opt.command;
-    
   }
 }
 
@@ -47,38 +46,42 @@ export const showNumberOfRequests = (data, opt) => {
 }
 
 export const showRequestsPerIP = (data, opt) => {
-  data.forEach((r) => {
-    console.log('---< ' + r.displayTime + ' >---------------------------------------------------------');
-    Object.entries(r.ip)
-      .sort((x, y) => { return y[1].count - x[1].count})
-      .filter((e, i) => {
-        if (!opt.top) return true;
-        if (opt.top > i) return true; 
-        return false;
-      })
-      .map((e) => {
-        const [ip, reqs] = e;
-        console.log(ip + ': ' + reqs.count);
-      });
-  });
+  data.forEach((r) => listRequestPerIP(r, opt));
+}
+
+export const listRequestsPerIP = (r, opt) => {
+  console.log('---< ' + r.displayTime + ' >---------------------------------------------------------');
+  Object.entries(r.ip)
+    .sort((x, y) => { return y[1].count - x[1].count})
+    .filter((e, i) => {
+      if (!opt.top) return true;
+      if (opt.top > i) return true; 
+      return false;
+    })
+    .map((e) => {
+      const [ip, reqs] = e;
+      console.log(ip + ': ' + reqs.count);
+    });
 }
 
 export const showRequestUrls = (data, opt) => {
-  data.forEach((r) => {
-    console.log('---< ' + r.displayTime + ' >---------------------------------------------------------');
-    const ip = Object.keys(r.ip)[0];
-    const obj = r.ip[ip];
-    Object.entries(obj.requests)
-      .sort((x, y) => { return y[1] - x[1]})
-      .filter((e, i) => {
-        if (!opt.top) return true;
-        if (opt.top > i) return true; 
-        return false;
-      })
-      .map((e) => {
-        const [url, count] = e;
-        console.log(url + ': ' + count);
-      });
-  });
+  data.forEach((r) => listRequestUrls(r, opt));
+}
+
+export const listRequestUrls = (r, opt) => {
+  console.log('---< ' + r.displayTime + ' >---------------------------------------------------------');
+  const ip = Object.keys(r.ip)[0];
+  const obj = r.ip[ip];
+  Object.entries(obj.requests)
+    .sort((x, y) => { return y[1] - x[1]})
+    .filter((e, i) => {
+      if (!opt.top) return true;
+      if (opt.top > i) return true; 
+      return false;
+    })
+    .map((e) => {
+      const [url, count] = e;
+      console.log(url + ': ' + count);
+    });
 }
 

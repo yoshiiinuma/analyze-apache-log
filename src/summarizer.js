@@ -2,27 +2,31 @@
 import { Transform } from 'stream'
 
 class Summarizer extends Transform {
-  constructor(options = {}) {
-    super(Object.assign(options, { objectMode: true }));
+  constructor(opts = {}) {
+    super(Object.assign(opts, { objectMode: true }));
+    this.opts = opts;
     this.r = null;
-    this.bucket = null;
-    this.period = options.period || 60000;
-    this.timeEndOffset = options.timeEndOffset || 17;
+    this.timeslot = null;
+    this.period = opts.period || 60000;
+    this.timeEndOffset = opts.timeEndOffset || 17;
   }
 
   // Expects line stream
   _transform(line, encoding, callback) {
-    let ip, time, usr, name, req, cd, ref, agt, resSize, inSize, outSize, elapsed;
-
-    [ip, time, usr, name, req, cd, ref, agt, resSize,
+    const [ip, timeOrig, usr, name, req, cd, ref, agt, resSize,
        inSize, outSize, elapsed] = line.toString().split(' | ');
 
-    time = time.slice(1, 21);
+    if (this.opts.ip && ip !== this.opts.ip) return;
+
+    let time = timeOrig.slice(1, 21);
     let timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
-    if (this.bucket === null || timestamp >= this.bucket + this.period) {
+    if (this.opts.from && timestamp < this.opts.from) return;
+    if (this.opts.to && timestamp >= this.opts.to) return;
+
+    if (this.timeslot === null || timestamp >= this.timeslot + this.period) {
       if (this.r) this.push(this.r);
-      this.bucket = timestamp - timestamp % 60000;
+      this.timeslot = timestamp - timestamp % 60000;
       let displayTime = time.slice(0, this.timeEndOffset);
       this.r = { timestamp, displayTime, count: 0, ip: {} };
     }

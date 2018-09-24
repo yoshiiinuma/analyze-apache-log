@@ -5,6 +5,7 @@ import readline from 'readline';
 
 import Summarizer from './summarizer.js';
 import Logger from './logger.js';
+import { listRequestsPerIP, listRequestUrls } from './report.js';
 
 /**
  * summarize followings per N minutes
@@ -13,8 +14,8 @@ import Logger from './logger.js';
  *
  *
  **/
-export const analyzeStream = (file, opts = {}) => {
-  const min = (opts.period == undefined)? 1 : parseInt(opts.period);
+export const analyzeStream = (file, opt = {}) => {
+  const min = (opt.period == undefined)? 1 : parseInt(opt.period);
   const period = min * 60 * 1000;
   const timeEndOffset = minToTimeEndOffset(min);
 
@@ -29,13 +30,30 @@ export const analyzeStream = (file, opts = {}) => {
       Logger.error(err)
     });
   let summarizer = new Summarizer({ period, timeEndOffset });
-  summarizer.on('data', (obj) => console.log(obj))
+
+  //summarizer.on('data', (obj) => console.log(obj))
+  summarizer.on('data', (r) => {
+    switch (opt.command) {
+      case 'count-req':
+        console.log(r.displayTime + ' ' + r.count);
+        break;
+      case 'count-ip':
+        if (opt.ip) {
+          listRequestUrls(r, opt);
+        } else {
+          listRequestsPerIP(r, opt);
+        }
+        break;
+      default:
+        throw 'Unsupported Command: ' + opt.command;
+    }
+  });
 
   return instream.pipe(linestream).pipe(summarizer);
 }
 
-export const analyze = (file, opts = {}) => {
-  const min = (opts.period == undefined)? 1 : parseInt(opts.period);
+export const analyze = (file, opt = {}) => {
+  const min = (opt.period == undefined)? 1 : parseInt(opt.period);
   const timeEndOffset = minToTimeEndOffset(min);
   const period = min * 60 * 1000;
 
@@ -58,13 +76,13 @@ export const analyze = (file, opts = {}) => {
       const [ip, timeOrig, usr, name, req, cd, ref, agt, resSize,
          inSize, outSize, elapsed] = line.split(' | ');
 
-      if (opts.ip && ip !== opts.ip) return;
+      if (opt.ip && ip !== opt.ip) return;
 
       let time = timeOrig.slice(1, 21);
       let timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
-      if (opts.from && timestamp < opts.from) return;
-      if (opts.to && timestamp >= opts.to) return;
+      if (opt.from && timestamp < opt.from) return;
+      if (opt.to && timestamp >= opt.to) return;
 
       if (timeslot === null || timestamp >= timeslot + period) {
         if (r !== null) results.push(r);
