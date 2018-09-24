@@ -10,23 +10,26 @@ import util from 'util';
 export const report = (data, opt) => {
   //console.log(util.inspect(data, false, null, true));
   switch (opt.command) {
-    case 'req':
+    case 'count-req':
       showNumberOfRequests(data, opt); 
       break;
-    case 'ip':
-      showRequestsPerIP(data, opt); 
+    case 'count-ip':
+      if (opt.ip) {
+        showRequestUrls(data, opt);
+      } else {
+        showRequestsPerIP(data, opt);
+      }
       break;
     default:
       throw 'Unsupported Command: ' + opt.command;
     
   }
-  //console.log(Object.keys(data));
 }
 
 export const showNumberOfRequests = (data, opt) => {
   if (opt.top) {
-    Object.entries(data).sort((x, y) => {
-      return y[1].count - x[1].count;
+    data.sort((x, y) => {
+      return y.count - x.count;
     })
     .filter((e, i) => {
       if (!opt.top) return true;
@@ -34,20 +37,19 @@ export const showNumberOfRequests = (data, opt) => {
       return false;
     })
     .map((e) => {
-      const [time, obj] = e;
-      console.log(time + ': ' + obj.count);
-    })
+      console.log(e.displayTime + ' ' + e.count);
+    });
   } else {
-    for(const [time, tbl] of Object.entries(data)) {
-      console.log(time + ' ' + tbl.count);
-    }
+    data.forEach((e) => {
+      console.log(e.displayTime + ' ' + e.count);
+    });
   }
 }
 
 export const showRequestsPerIP = (data, opt) => {
-  for(const [time, tbl] of Object.entries(data)) {
-    console.log('---< ' + time + ' >---------------------------------------------------------');
-    Object.entries(tbl.ip)
+  data.forEach((r) => {
+    console.log('---< ' + r.displayTime + ' >---------------------------------------------------------');
+    Object.entries(r.ip)
       .sort((x, y) => { return y[1].count - x[1].count})
       .filter((e, i) => {
         if (!opt.top) return true;
@@ -57,7 +59,26 @@ export const showRequestsPerIP = (data, opt) => {
       .map((e) => {
         const [ip, reqs] = e;
         console.log(ip + ': ' + reqs.count);
+      });
+  });
+}
+
+export const showRequestUrls = (data, opt) => {
+  data.forEach((r) => {
+    console.log('---< ' + r.displayTime + ' >---------------------------------------------------------');
+    const ip = Object.keys(r.ip)[0];
+    const obj = r.ip[ip];
+    Object.entries(obj.requests)
+      .sort((x, y) => { return y[1] - x[1]})
+      .filter((e, i) => {
+        if (!opt.top) return true;
+        if (opt.top > i) return true; 
+        return false;
       })
-  }
+      .map((e) => {
+        const [url, count] = e;
+        console.log(url + ': ' + count);
+      });
+  });
 }
 

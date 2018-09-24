@@ -18,8 +18,6 @@ export const analyzeStream = (file, opts = {}) => {
   const period = min * 60 * 1000;
   const timeEndOffset = minToTimeEndOffset(min);
 
-  console.log(file);
-
   let instream = fs.createReadStream(file)
     .on('error', (err) => {
       Logger.error('PushManager#push instream');
@@ -42,38 +40,44 @@ export const analyze = (file, opts = {}) => {
   const period = min * 60 * 1000;
 
   return new Promise((resolve, reject) => {
-    let r = {};
-    let cur = null;
-    let timestamp = null;
-    let bucket = null;
+    let results = [];
+    let r = null;
+    let timeslot = null;
 
     const rl = readline.createInterface({
       input: fs.createReadStream(file),
       terminal: false
     });
 
-    rl.on('close', () => resolve(r));
+    rl.on('close', () => {
+      if (r !== null) results.push(r);
+      resolve(results)
+    });
     rl.on('error', (e) => reject(e));
-    rl.on('line', (l) => {
-      let ip, time, usr, name, req, cd, ref, agt, resSize, inSize, outSize, elapsed;
+    rl.on('line', (line) => {
+      const [ip, timeOrig, usr, name, req, cd, ref, agt, resSize,
+         inSize, outSize, elapsed] = line.split(' | ');
 
-      [ip, time, usr, name, req, cd, ref, agt, resSize,
-         inSize, outSize, elapsed] = l.split(' | ');
+      if (opts.ip && ip !== opts.ip) return;
 
-      time = time.slice(1, 21);
-      timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
+      let time = timeOrig.slice(1, 21);
+      let timestamp = Date.parse(time.slice(0, 11) + ' ' + time.slice(12, 21));
 
-      if (bucket === null || timestamp >= bucket + period) {
-        bucket = timestamp - timestamp % 60000;
-        cur = time.slice(0, timeEndOffset);
-        r[cur] = { count: 0, ip: {} };
+      if (opts.from && timestamp < opts.from) return;
+      if (opts.to && timestamp >= opts.to) return;
+
+      if (timeslot === null || timestamp >= timeslot + period) {
+        if (r !== null) results.push(r);
+        timeslot = timestamp - timestamp % 60000;
+        let displayTime = time.slice(0, timeEndOffset);
+        r = { timestamp, displayTime, count: 0, ip: {} };
       }
-      if (r[cur]['ip'][ip] == undefined) r[cur]['ip'][ip] = { count:0, requests: {} };
-      if (r[cur]['ip'][ip]['requests'][req] == undefined) r[cur]['ip'][ip]['requests'][req] = 0;
+      if (r['ip'][ip] == undefined) r['ip'][ip] = { count:0, requests: {} };
+      if (r['ip'][ip]['requests'][req] == undefined) r['ip'][ip]['requests'][req] = 0;
 
-      r[cur]['count']++;
-      r[cur]['ip'][ip]['count']++;
-      r[cur]['ip'][ip]['requests'][req]++;
+      r['count']++;
+      r['ip'][ip]['count']++;
+      r['ip'][ip]['requests'][req]++;
     });
   });
 }
