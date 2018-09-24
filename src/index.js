@@ -56,7 +56,7 @@ if (!fs.existsSync(file)) {
   process.exit();
 }
 
-const regexDate = /^[01]?\d\/[0123]?\d\/20\d{2}(-[01]?\d:[0-5]?\d)?$/;
+const regexDate = /^[01]?\d\/[0123]?\d\/20\d{2}(-([01]?\d|2[0-3]):[0-5]?\d)?$/;
 
 if (process.argv.length > 3) {
   for (let i = 3; i < process.argv.length; i++) {

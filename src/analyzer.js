@@ -29,13 +29,8 @@ export const analyzeStream = (file, opt = {}) => {
       Logger.error('PushManager#read linestream');
       Logger.error(err)
     });
-  let summarizer = new Summarizer({ period, timeEndOffset });
+  let summarizer = new Summarizer(Object.assign(opt, { period, timeEndOffset }));
   let report = new StreamReport(opt);
-
-  //summarizer.on('data', (obj) => console.log(obj))
-  //summarizer.on('data', (r) => {
-  //  reportStream(r, opt);
-  //});
 
   return instream.pipe(linestream).pipe(summarizer).pipe(report);
 }
