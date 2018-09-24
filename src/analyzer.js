@@ -5,7 +5,7 @@ import readline from 'readline';
 
 import Summarizer from './summarizer.js';
 import Logger from './logger.js';
-import { listRequestsPerIP, listRequestUrls } from './report.js';
+import { reportStream } from './report.js';
 
 /**
  * summarize followings per N minutes
@@ -33,20 +33,7 @@ export const analyzeStream = (file, opt = {}) => {
 
   //summarizer.on('data', (obj) => console.log(obj))
   summarizer.on('data', (r) => {
-    switch (opt.command) {
-      case 'count-req':
-        console.log(r.displayTime + ' ' + r.count);
-        break;
-      case 'count-ip':
-        if (opt.ip) {
-          listRequestUrls(r, opt);
-        } else {
-          listRequestsPerIP(r, opt);
-        }
-        break;
-      default:
-        throw 'Unsupported Command: ' + opt.command;
-    }
+    reportStream(r, opt);
   });
 
   return instream.pipe(linestream).pipe(summarizer);

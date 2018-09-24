@@ -25,6 +25,23 @@ export const report = (data, opt) => {
   }
 }
 
+export const reportStream = (r, opt) => {
+  switch (opt.command) {
+    case 'count-req':
+      console.log(r.displayTime + ' ' + r.count);
+      break;
+    case 'count-ip':
+      if (opt.ip) {
+        listRequestUrls(r, opt);
+      } else {
+        listRequestsPerIP(r, opt);
+      }
+      break;
+    default:
+      throw 'Unsupported Command: ' + opt.command;
+  }
+}
+
 export const showNumberOfRequests = (data, opt) => {
   if (opt.top) {
     data.sort((x, y) => {
