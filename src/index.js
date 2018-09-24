@@ -72,9 +72,9 @@ if (process.argv.length > 3) {
   }
 }
 
-//analyzeStream(file, opts).pipe(process.stdout);
+analyzeStream(file, opts);
 
-analyze(file, opts)
-  .then((r) => report(r, opts))
-  .catch((e) => console.log(e));
+//analyze(file, opts)
+//  .then((r) => report(r, opts))
+//  .catch((e) => console.log(e));
 

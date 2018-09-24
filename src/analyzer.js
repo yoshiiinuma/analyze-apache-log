@@ -3,6 +3,7 @@ import fs from 'fs';
 import { LineStream } from 'byline';
 import readline from 'readline';
 
+import Summarizer from './summarizer.js';
 import Logger from './logger.js';
 
 /**
@@ -14,7 +15,8 @@ import Logger from './logger.js';
  **/
 export const analyzeStream = (file, opts = {}) => {
   const min = (opts.period == undefined)? 1 : parseInt(opts.period);
-  const timeEnd = minToTimeEndOffset(min);
+  const period = min * 60 * 1000;
+  const timeEndOffset = minToTimeEndOffset(min);
 
   console.log(file);
 
@@ -28,12 +30,15 @@ export const analyzeStream = (file, opts = {}) => {
       Logger.error('PushManager#read linestream');
       Logger.error(err)
     });
-  return instream.pipe(linestream);
+  let summarizer = new Summarizer({ period, timeEndOffset });
+  summarizer.on('data', (obj) => console.log(obj))
+
+  return instream.pipe(linestream).pipe(summarizer);
 }
 
 export const analyze = (file, opts = {}) => {
   const min = (opts.period == undefined)? 1 : parseInt(opts.period);
-  const timeEnd = minToTimeEndOffset(min);
+  const timeEndOffset = minToTimeEndOffset(min);
   const period = min * 60 * 1000;
 
   return new Promise((resolve, reject) => {
@@ -60,7 +65,7 @@ export const analyze = (file, opts = {}) => {
 
       if (bucket === null || timestamp >= bucket + period) {
         bucket = timestamp - timestamp % 60000;
-        cur = time.slice(0, timeEnd);
+        cur = time.slice(0, timeEndOffset);
         r[cur] = { count: 0, ip: {} };
       }
       if (r[cur]['ip'][ip] == undefined) r[cur]['ip'][ip] = { count:0, requests: {} };
