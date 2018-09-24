@@ -39,6 +39,10 @@ class Summarizer extends Transform {
 
     callback();
   }
+
+  _flush(callback) {
+    if (this.r) this.push(this.r);
+  }
 }
 
 export default Summarizer;
