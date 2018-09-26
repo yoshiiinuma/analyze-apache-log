@@ -2,7 +2,7 @@
 import fs from 'fs';
 import util from 'util';
 import { analyze, analyzeStream } from './analyzer.js';
-import { report } from './report.js';
+import { reportStream, StreamReport } from './report.js';
 
 const DEFAULT_PERIOD = 1;
 const COMMANDS = ['count-req', 'count-ip'];
@@ -109,7 +109,9 @@ if (process.argv.length > 3) {
   }
 }
 
-analyzeStream(file, opts);
+
+const sreport = new StreamReport(opts);
+analyzeStream(file, opts).pipe(sreport);
 
 //analyze(file, opts)
 //  .then((r) => report(r, opts))
